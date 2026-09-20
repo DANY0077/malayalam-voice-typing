@@ -1,0 +1,108 @@
+name: iOS Build
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - debug
+
+jobs:
+  build-ios:
+    name: Build iOS
+    runs-on: macos-latest
+    timeout-minutes: 60
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: Get dependencies
+        run: flutter pub get
+      
+      - name: Generate code
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+      
+      - name: Build iOS
+        run: |
+          flutter build ios --release --no-codesign
+        env:
+          FLUTTER_BUILD_MODE: release
+      
+      - name: Create IPA
+        run: |
+          cd build/ios/iphoneos
+          mkdir -p Payload
+          cp -r Runner.app Payload/
+          zip -r malayalam_voice_typing.ipa Payload/
+      
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: malayalam-voice-typing-ipa
+          path: build/ios/iphoneos/malayalam_voice_typing.ipa
+          retention-days: 30
+      
+      - name: Upload to TestFlight (optional)
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
+        run: |
+          echo "Add your TestFlight upload script here"
+          # xcrun altool --upload-app -f build/ios/iphoneos/malayalam_voice_typing.ipa -t ios -u $APP_STORE_CONNECT_USER -p $APP_STORE_CONNECT_KEY
+
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0'
+          channel: 'stable'
+          cache: true
+      
+      - name: Get dependencies
+        run: flutter pub get
+      
+      - name: Generate code
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+      
+      - name: Build APK
+        run: flutter build apk --release
+      
+      - name: Build App Bundle
+        run: flutter build appbundle --release
+      
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: malayalam-voice-typing-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+      
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: malayalam-voice-typing-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30

@@ -1,0 +1,34 @@
+# Flutter
+.dart_tool/
+.packages
+build/
+*.iml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Flutter build outputs
+*.apk
+*.aab
+*.ipa
+*.dSYM/
+*.xcarchive/
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.gr.dart
+
+# Local configuration
+.env
+*.local.dart
+
+# Codemagic
+codemagic.yaml.local
