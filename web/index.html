@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#00695C">
+    <meta name="description" content="Malayalam Voice Typing - AI-powered speech to text">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Malayalam Voice">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icons/Icon-192.png">
+    <link rel="apple-touch-icon" href="icons/Icon-192.png">
+    <title>Malayalam Voice Typing</title>
+    <script>
+        // Service Worker registration for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('flutter_service_worker.js')
+                    .catch(err => console.log('SW registration failed:', err));
+            });
+        }
+
+        // iOS Safari speech recognition polyfill check
+        window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        window.SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+    </script>
+</head>
+<body>
+    <script src="main.dart.js" type="application/javascript"></script>
+    <script>
+        // Prevent pull-to-refresh on iOS
+        document.body.addEventListener('touchmove', e => {
+            if (e.target === document.body) e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>

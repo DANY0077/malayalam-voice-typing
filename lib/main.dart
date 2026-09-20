@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart';
 import 'src/models/app_state.dart';
 import 'src/screens/home_screen.dart';
+import 'src/services/speech_service_interface.dart';
 import 'src/services/speech_service.dart';
+import 'src/services/web_speech_service.dart';
 import 'src/services/storage_service.dart';
 
 void main() async {
@@ -13,9 +16,13 @@ void main() async {
   
   runApp(
     MultiProvider(
-      providers [
+      providers: [
         ChangeNotifierProvider(create: (_) => AppState(storageService)),
-        Provider(create: (_) => SpeechService()),
+        Provider<SpeechServiceInterface>(
+          create: (_) => kIsWeb 
+              ? WebSpeechService(AppState(storageService)) 
+              : SpeechService(AppState(storageService)),
+        ),
       ],
       child: const MalayalamVoiceTypingApp(),
     ),

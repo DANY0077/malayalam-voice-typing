@@ -4,7 +4,7 @@ import 'package:clipboard/clipboard.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:vibration/vibration.dart';
 import '../models/app_state.dart';
-../services/speech_service.dart';
+import '../services/speech_service_interface.dart';
 import '../widgets/language_selector.dart';
 import '../widgets/text_display.dart';
 import '../widgets/control_buttons.dart';
@@ -19,7 +19,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
-  late SpeechService _speechService;
+  late SpeechServiceInterface _speechService;
   bool _isInitialized = false;
 
   @override
@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _initializeSpeech() async {
-    _speechService = context.read<SpeechService>();
+    _speechService = context.read<SpeechServiceInterface>();
     final initialized = await _speechService.initialize();
     if (mounted) {
       setState(() => _isInitialized = initialized);
